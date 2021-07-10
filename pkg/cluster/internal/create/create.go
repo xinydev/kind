@@ -105,6 +105,7 @@ func Cluster(logger log.Logger, p providers.Provider, opts *ClusterOptions) erro
 		}
 		return err
 	}
+	logger.V(3).Infof("Creating cluster Finished %q ...\n", opts.Config.Name)
 
 	// TODO(bentheelder): make this controllable from the command line?
 	actionsToRun := []actions.Action{
@@ -139,6 +140,7 @@ func Cluster(logger log.Logger, p providers.Provider, opts *ClusterOptions) erro
 			return err
 		}
 	}
+	logger.V(3).Infof("run all actions Finished %q ...\n", opts.Config.Name)
 
 	// skip the rest if we're not setting up kubernetes
 	if opts.StopBeforeSettingUpKubernetes {

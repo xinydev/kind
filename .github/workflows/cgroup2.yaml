@@ -67,7 +67,7 @@ jobs:
 
       - name: Create a cluster
         run: |
-          "$HELPER" kind create cluster -v7 --wait 10m --retain
+          "$HELPER" kind create cluster -v 100 --wait 10m --retain
 
       - name: Get Cluster status
         run: |

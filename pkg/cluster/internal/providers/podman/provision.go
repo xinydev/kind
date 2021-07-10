@@ -58,6 +58,10 @@ func planCreation(cfg *config.Cluster, networkName string) (createContainerFuncs
 		// plan loadbalancer node
 		name := nodeNamer(constants.ExternalLoadBalancerNodeRoleValue)
 		createContainerFuncs = append(createContainerFuncs, func() error {
+			fmt.Printf("before runArgsForLoadBalancer ")
+			defer func() {
+				fmt.Printf("end runArgsForLoadBalancer")
+			}()
 			args, err := runArgsForLoadBalancer(cfg, name, genericArgs)
 			if err != nil {
 				return err
@@ -92,6 +96,10 @@ func planCreation(cfg *config.Cluster, networkName string) (createContainerFuncs
 						ContainerPort: common.APIServerInternalPort,
 					},
 				)
+				fmt.Printf("before control runArgsForNode")
+				defer func() {
+					fmt.Printf("after control runArgsForNode")
+				}()
 				args, err := runArgsForNode(node, cfg.Networking.IPFamily, name, genericArgs)
 				if err != nil {
 					return err
@@ -100,6 +108,10 @@ func planCreation(cfg *config.Cluster, networkName string) (createContainerFuncs
 			})
 		case config.WorkerRole:
 			createContainerFuncs = append(createContainerFuncs, func() error {
+				fmt.Printf("before woker runArgsForNode")
+				defer func() {
+					fmt.Printf("after woker runArgsForNode")
+				}()
 				args, err := runArgsForNode(node, cfg.Networking.IPFamily, name, genericArgs)
 				if err != nil {
 					return err
@@ -114,6 +126,10 @@ func planCreation(cfg *config.Cluster, networkName string) (createContainerFuncs
 }
 
 func createContainer(args []string) error {
+	fmt.Printf("before createContainer,%s", args)
+	defer func() {
+		fmt.Printf("after createContainer,%s", args)
+	}()
 	if err := exec.Command("podman", args...).Run(); err != nil {
 		return errors.Wrap(err, "podman run error")
 	}
