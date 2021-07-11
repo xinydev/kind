@@ -67,11 +67,11 @@ jobs:
 
       - name: Create a cluster
         run: |
-          podman run docker.io/library/ubuntu echo 1
-          podman run --privileged docker.io/library/ubuntu echo 2
-          podman run --privileged --tmpfs /tmp docker.io/library/ubuntu echo 3
-          podman run --privileged --tmpfs /tmp docker.io/library/ubuntu --device /dev/fuse echo 4
-          podman run --hostname kind-control-plane --name kind-control-plane --label io.x-k8s.kind.role=control-plane --privileged --tmpfs /tmp --tmpfs /run --volume d83c08c1a6ab362141c14b05bbb4c470a44f0ff671a5d62ee9bf04ded92821b5:/var:suid,exec,dev --volume /lib/modules:/lib/modules:ro -e KIND_EXPERIMENTAL_CONTAINERD_SNAPSHOTTER --device /dev/fuse --detach --tty --net kind --label io.x-k8s.kind.cluster=kind -e container=podman --publish=127.0.0.1:42301:6443/tcp -e KUBECONFIG=/etc/kubernetes/admin.conf docker.io/kindest/node@sha256:8a0b572d3e5c24fe516cfc612ce6e5d707b4b6b2f97a4943ece85673f91f853d
+          "$HELPER" podman run docker.io/library/ubuntu echo 1
+          "$HELPER" podman run --privileged docker.io/library/ubuntu echo 2
+          "$HELPER" podman run --privileged --tmpfs /tmp docker.io/library/ubuntu echo 3
+          "$HELPER" podman run --privileged --tmpfs /tmp docker.io/library/ubuntu --device /dev/fuse echo 4
+          "$HELPER" podman run --hostname kind-control-plane --name kind-control-plane --label io.x-k8s.kind.role=control-plane --privileged --tmpfs /tmp --tmpfs /run --volume d83c08c1a6ab362141c14b05bbb4c470a44f0ff671a5d62ee9bf04ded92821b5:/var:suid,exec,dev --volume /lib/modules:/lib/modules:ro -e KIND_EXPERIMENTAL_CONTAINERD_SNAPSHOTTER --device /dev/fuse --detach --tty --net kind --label io.x-k8s.kind.cluster=kind -e container=podman --publish=127.0.0.1:42301:6443/tcp -e KUBECONFIG=/etc/kubernetes/admin.conf docker.io/kindest/node@sha256:8a0b572d3e5c24fe516cfc612ce6e5d707b4b6b2f97a4943ece85673f91f853d
 
           "$HELPER" kind create cluster -v 100 --wait 10m --retain
 
