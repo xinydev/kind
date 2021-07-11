@@ -17,6 +17,7 @@ limitations under the License.
 package podman
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"path/filepath"
@@ -132,7 +133,9 @@ func createContainer(logger log.Logger, args []string) error {
 	defer func() {
 		logger.V(1).Infof("after createContainer,%s,usage:%v", args, time.Now().After(s))
 	}()
-	c := exec.Command("podman", args...)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+	c := exec.CommandContext(ctx, "podman", args...)
 	var outbuf, errbuf strings.Builder
 	c.SetStderr(&errbuf)
 	c.SetStdout(&outbuf)
