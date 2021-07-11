@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"net"
 	"path/filepath"
-	"sigs.k8s.io/kind/pkg/log"
+	"sigs.k8s.io/kind/pkg/cmd"
 	"strings"
 
 	"sigs.k8s.io/kind/pkg/cluster/constants"
@@ -40,7 +40,7 @@ func planCreation(cfg *config.Cluster, networkName string) (createContainerFuncs
 	if err != nil {
 		return nil, err
 	}
-	logger := log.NoopLogger{}
+	logger := cmd.NewLogger()
 	// only the external LB should reflect the port if we have multiple control planes
 	apiServerPort := cfg.Networking.APIServerPort
 	apiServerAddress := cfg.Networking.APIServerAddress
@@ -127,7 +127,7 @@ func planCreation(cfg *config.Cluster, networkName string) (createContainerFuncs
 }
 
 func createContainer(args []string) error {
-	logger := log.NoopLogger{}
+	logger := cmd.NewLogger()
 	logger.V(1).Infof("before createContainer,%s", args)
 	defer func() {
 		logger.V(1).Infof("after createContainer,%s", args)
