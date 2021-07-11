@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"net"
 	"path/filepath"
+	"sigs.k8s.io/kind/pkg/log"
 	"strings"
 
 	"sigs.k8s.io/kind/pkg/cluster/constants"
@@ -39,7 +40,7 @@ func planCreation(cfg *config.Cluster, networkName string) (createContainerFuncs
 	if err != nil {
 		return nil, err
 	}
-
+	logger := log.NoopLogger{}
 	// only the external LB should reflect the port if we have multiple control planes
 	apiServerPort := cfg.Networking.APIServerPort
 	apiServerAddress := cfg.Networking.APIServerAddress
@@ -58,9 +59,9 @@ func planCreation(cfg *config.Cluster, networkName string) (createContainerFuncs
 		// plan loadbalancer node
 		name := nodeNamer(constants.ExternalLoadBalancerNodeRoleValue)
 		createContainerFuncs = append(createContainerFuncs, func() error {
-			fmt.Printf("before runArgsForLoadBalancer ")
+			logger.V(1).Infof("before runArgsForLoadBalancer ")
 			defer func() {
-				fmt.Printf("end runArgsForLoadBalancer")
+				logger.V(1).Infof("end runArgsForLoadBalancer")
 			}()
 			args, err := runArgsForLoadBalancer(cfg, name, genericArgs)
 			if err != nil {
@@ -96,9 +97,9 @@ func planCreation(cfg *config.Cluster, networkName string) (createContainerFuncs
 						ContainerPort: common.APIServerInternalPort,
 					},
 				)
-				fmt.Printf("before control runArgsForNode")
+				logger.V(1).Infof("before control runArgsForNode")
 				defer func() {
-					fmt.Printf("after control runArgsForNode")
+					logger.V(1).Infof("after control runArgsForNode")
 				}()
 				args, err := runArgsForNode(node, cfg.Networking.IPFamily, name, genericArgs)
 				if err != nil {
@@ -108,9 +109,9 @@ func planCreation(cfg *config.Cluster, networkName string) (createContainerFuncs
 			})
 		case config.WorkerRole:
 			createContainerFuncs = append(createContainerFuncs, func() error {
-				fmt.Printf("before woker runArgsForNode")
+				logger.V(1).Infof("before woker runArgsForNode")
 				defer func() {
-					fmt.Printf("after woker runArgsForNode")
+					logger.V(1).Infof("after woker runArgsForNode")
 				}()
 				args, err := runArgsForNode(node, cfg.Networking.IPFamily, name, genericArgs)
 				if err != nil {
@@ -126,9 +127,10 @@ func planCreation(cfg *config.Cluster, networkName string) (createContainerFuncs
 }
 
 func createContainer(args []string) error {
-	fmt.Printf("before createContainer,%s", args)
+	logger := log.NoopLogger{}
+	logger.V(1).Infof("before createContainer,%s", args)
 	defer func() {
-		fmt.Printf("after createContainer,%s", args)
+		logger.V(1).Infof("after createContainer,%s", args)
 	}()
 	if err := exec.Command("podman", args...).Run(); err != nil {
 		return errors.Wrap(err, "podman run error")
