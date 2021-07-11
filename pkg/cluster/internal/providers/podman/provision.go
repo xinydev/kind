@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -106,6 +107,16 @@ func planCreation(logger log.Logger, cfg *config.Cluster, networkName string) (c
 				if err != nil {
 					return err
 				}
+				for i := 0; i < 5; i++ {
+					logger.V(1).Infof("before try")
+					if err := createContainer(logger, args); err != nil {
+						logger.Errorf("error,%s", err)
+					} else {
+						break
+					}
+					logger.V(1).Infof("after try")
+				}
+
 				return createContainer(logger, args)
 			})
 		case config.WorkerRole:
@@ -133,12 +144,12 @@ func createContainer(logger log.Logger, args []string) error {
 	defer func() {
 		logger.V(1).Infof("after createContainer,%s,usage:%v", args, time.Now().After(s))
 	}()
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 	defer cancel()
 	c := exec.CommandContext(ctx, "podman", args...)
 	var outbuf, errbuf strings.Builder
-	c.SetStderr(&errbuf)
-	c.SetStdout(&outbuf)
+	c.SetStderr(os.Stderr)
+	c.SetStdout(os.Stdout)
 	defer func() {
 		logger.V(1).Infof("stdout:%s", outbuf.String())
 		logger.V(1).Infof("stderr:%s", errbuf.String())
