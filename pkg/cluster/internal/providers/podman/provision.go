@@ -107,17 +107,19 @@ func planCreation(logger log.Logger, cfg *config.Cluster, networkName string) (c
 				if err != nil {
 					return err
 				}
+				var lastErr error
 				for i := 0; i < 5; i++ {
 					logger.V(1).Infof("before try")
-					if err := createContainer(logger, args); err != nil {
-						logger.Errorf("error,%s", err)
+					_ = exec.Command("docker", "rm", name).Run()
+					if lastErr = createContainer(logger, args); lastErr != nil {
+						logger.Errorf("error,%s", lastErr)
 					} else {
 						break
 					}
 					logger.V(1).Infof("after try")
 				}
 
-				return createContainer(logger, args)
+				return nil
 			})
 		case config.WorkerRole:
 			createContainerFuncs = append(createContainerFuncs, func() error {
