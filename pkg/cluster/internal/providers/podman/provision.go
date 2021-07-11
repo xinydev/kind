@@ -20,8 +20,8 @@ import (
 	"fmt"
 	"net"
 	"path/filepath"
-	"sigs.k8s.io/kind/pkg/cmd"
 	"strings"
+	"time"
 
 	"sigs.k8s.io/kind/pkg/cluster/constants"
 	"sigs.k8s.io/kind/pkg/errors"
@@ -30,17 +30,17 @@ import (
 	"sigs.k8s.io/kind/pkg/cluster/internal/loadbalancer"
 	"sigs.k8s.io/kind/pkg/cluster/internal/providers/common"
 	"sigs.k8s.io/kind/pkg/internal/apis/config"
+	"sigs.k8s.io/kind/pkg/log"
 )
 
 // planCreation creates a slice of funcs that will create the containers
-func planCreation(cfg *config.Cluster, networkName string) (createContainerFuncs []func() error, err error) {
+func planCreation(logger log.Logger, cfg *config.Cluster, networkName string) (createContainerFuncs []func() error, err error) {
 	// these apply to all container creation
 	nodeNamer := common.MakeNodeNamer(cfg.Name)
 	genericArgs, err := commonArgs(cfg, networkName)
 	if err != nil {
 		return nil, err
 	}
-	logger := cmd.NewLogger()
 	// only the external LB should reflect the port if we have multiple control planes
 	apiServerPort := cfg.Networking.APIServerPort
 	apiServerAddress := cfg.Networking.APIServerAddress
@@ -67,7 +67,7 @@ func planCreation(cfg *config.Cluster, networkName string) (createContainerFuncs
 			if err != nil {
 				return err
 			}
-			return createContainer(args)
+			return createContainer(logger, args)
 		})
 	}
 
@@ -105,7 +105,7 @@ func planCreation(cfg *config.Cluster, networkName string) (createContainerFuncs
 				if err != nil {
 					return err
 				}
-				return createContainer(args)
+				return createContainer(logger, args)
 			})
 		case config.WorkerRole:
 			createContainerFuncs = append(createContainerFuncs, func() error {
@@ -117,7 +117,7 @@ func planCreation(cfg *config.Cluster, networkName string) (createContainerFuncs
 				if err != nil {
 					return err
 				}
-				return createContainer(args)
+				return createContainer(logger, args)
 			})
 		default:
 			return nil, errors.Errorf("unknown node role: %q", node.Role)
@@ -126,13 +126,21 @@ func planCreation(cfg *config.Cluster, networkName string) (createContainerFuncs
 	return createContainerFuncs, nil
 }
 
-func createContainer(args []string) error {
-	logger := cmd.NewLogger()
+func createContainer(logger log.Logger, args []string) error {
+	s := time.Now()
 	logger.V(1).Infof("before createContainer,%s", args)
 	defer func() {
-		logger.V(1).Infof("after createContainer,%s", args)
+		logger.V(1).Infof("after createContainer,%s,usage:%v", args, time.Now().After(s))
 	}()
-	if err := exec.Command("podman", args...).Run(); err != nil {
+	c := exec.Command("podman", args...)
+	var outbuf, errbuf strings.Builder
+	c.SetStderr(&errbuf)
+	c.SetStdout(&outbuf)
+	defer func() {
+		logger.V(1).Infof("stdout:%s", outbuf.String())
+		logger.V(1).Infof("stderr:%s", errbuf.String())
+	}()
+	if err := c.Run(); err != nil {
 		return errors.Wrap(err, "podman run error")
 	}
 	return nil
