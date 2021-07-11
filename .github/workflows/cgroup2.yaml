@@ -67,6 +67,7 @@ jobs:
 
       - name: Create a cluster
         run: |
+          podman run docker.io/library/ubuntu hostname
           "$HELPER" kind create cluster -v 100 --wait 10m --retain
 
       - name: Get Cluster status
