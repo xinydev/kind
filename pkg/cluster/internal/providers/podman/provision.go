@@ -20,7 +20,6 @@ import (
 	"context"
 	"fmt"
 	"net"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -110,7 +109,7 @@ func planCreation(logger log.Logger, cfg *config.Cluster, networkName string) (c
 				var lastErr error
 				for i := 0; i < 5; i++ {
 					logger.V(1).Infof("before try")
-					_ = exec.Command("docker", "rm", name).Run()
+					_ = exec.Command("podman", "rm", name).Run()
 					if lastErr = createContainer(logger, args); lastErr != nil {
 						logger.Errorf("error,%s", lastErr)
 					} else {
@@ -123,6 +122,8 @@ func planCreation(logger log.Logger, cfg *config.Cluster, networkName string) (c
 			})
 		case config.WorkerRole:
 			createContainerFuncs = append(createContainerFuncs, func() error {
+				_ = exec.Command("podman", "rm", name).Run()
+
 				logger.V(1).Infof("before woker runArgsForNode")
 				defer func() {
 					logger.V(1).Infof("after woker runArgsForNode")
@@ -150,8 +151,8 @@ func createContainer(logger log.Logger, args []string) error {
 	defer cancel()
 	c := exec.CommandContext(ctx, "podman", args...)
 	var outbuf, errbuf strings.Builder
-	c.SetStderr(os.Stderr)
-	c.SetStdout(os.Stdout)
+	c.SetStderr(&errbuf)
+	c.SetStdout(&outbuf)
 	defer func() {
 		logger.V(1).Infof("stdout:%s", outbuf.String())
 		logger.V(1).Infof("stderr:%s", errbuf.String())
