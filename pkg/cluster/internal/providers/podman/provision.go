@@ -188,6 +188,7 @@ func commonArgs(cfg *config.Cluster, networkName string) ([]string, error) {
 		// label the node with the cluster ID
 		"--label", fmt.Sprintf("%s=%s", clusterLabelKey, cfg.Name),
 		// specify container implementation to systemd
+		"--log-level", "debug",
 		"-e", "container=podman",
 	}
 
