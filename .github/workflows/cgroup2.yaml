@@ -68,6 +68,7 @@ jobs:
 
       - name: Create a cluster
         run: |
+          "$HELPER" podman info
           "$HELPER" podman run docker.io/library/ubuntu echo 1
           "$HELPER" podman run --privileged docker.io/library/ubuntu echo 2
           "$HELPER" podman run --privileged --tmpfs /tmp docker.io/library/ubuntu echo 3
