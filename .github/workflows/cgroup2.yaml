@@ -59,6 +59,7 @@ jobs:
         run: |
           # We have modprobe ip6_tables in Vagrantfile, but it seems we have to modprobe it once again
           "$HELPER" sudo modprobe ip6_tables
+          "$HELPER" sudo dnf install -y fuse3-devel
 
       - name: Show provider info
         run: |
