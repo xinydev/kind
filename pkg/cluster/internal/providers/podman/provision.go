@@ -142,12 +142,11 @@ func planCreation(logger log.Logger, cfg *config.Cluster, networkName string) (c
 }
 
 func createContainer(logger log.Logger, args []string) error {
-	s := time.Now()
-	logger.V(1).Infof("before createContainer,%s", args)
+	logger.V(1).Infof("before createContainer,%s,%v", args, time.Now())
 	defer func() {
-		logger.V(1).Infof("after createContainer,%s,usage:%v", args, time.Now().After(s))
+		logger.V(1).Infof("after createContainer,%s,usage:%v", args, time.Now())
 	}()
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
 	defer cancel()
 	c := exec.CommandContext(ctx, "podman", args...)
 	var outbuf, errbuf strings.Builder
