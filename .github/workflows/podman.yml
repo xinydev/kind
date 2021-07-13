@@ -68,6 +68,8 @@ jobs:
             - containerPort: 443
               hostPort: 443
               listenAddress: 0.0.0.0
+            - containerPort: 412
+              listenAddress: 0.0.0.0
           EOF
 
       - name: Create multi node cluster
