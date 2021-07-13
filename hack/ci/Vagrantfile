@@ -27,13 +27,19 @@ Vagrant.configure("2") do |config|
     dnf install -y golang-go make kubernetes-client docker-ce-rootless-extras wget
     systemctl enable --now docker
 
+    # libseccomp-dev
+    # golang-github-seccomp-containers-golang-dev
+    # libgpgme-dev
+    # sudo apt install librust-seccomp-sys-dev libseccomp-dev libseccomp2 seccomp
+
+
     # install podman
     # wget https://github.com/containers/podman/releases/download/v3.2.1/podman-remote-static.tar.gz
     # tar -xzvf podman-remote-static.tar.gz
     # cp podman-remote-static /usr/bin/podman
-    # from https://koji.fedoraproject.org/koji
-    wget https://kojipkgs.fedoraproject.org//packages/podman/3.2.1/1.fc34/x86_64/podman-3.2.2-1.fc34.x86_64.rpm
-    dnf localinstall -y podman-3.2.2-1.fc34.x86_64.rpm
+    # from https://koji.fedoraproject.org/koji/packageinfo?packageID=26289
+    wget https://kojipkgs.fedoraproject.org//packages/podman/3.3.0/0.21.dev.git599b7d7.fc35/x86_64/podman-3.3.0-0.21.dev.git599b7d7.fc35.x86_64.rpm
+    dnf localinstall -y podman-3.3.0-0.21.dev.git599b7d7.fc35.x86_64.rpm
     podman info
     # Configuration for rootless: https://kind.sigs.k8s.io/docs/user/rootless/
     mkdir -p "/etc/systemd/system/user@.service.d"
