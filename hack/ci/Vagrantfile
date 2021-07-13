@@ -24,15 +24,17 @@ Vagrant.configure("2") do |config|
     # So we need to install docker-ce and docker-ce-rootless-extras from the upstream.
     curl -fsSL https://get.docker.com | sh
     # dnf install -y podman-2:3.1.0-1.fc34
-    dnf install -y golang-go make kubernetes-client docker-ce-rootless-extras
+    dnf install -y golang-go make kubernetes-client docker-ce-rootless-extras wget
     systemctl enable --now docker
 
     # install podman
-    dnf install -y wget tar
-    wget https://github.com/containers/podman/releases/download/v3.2.1/podman-remote-static.tar.gz
-    tar -xzvf podman-remote-static.tar.gz
-    cp podman-remote-static /usr/bin/podman
-
+    # wget https://github.com/containers/podman/releases/download/v3.2.1/podman-remote-static.tar.gz
+    # tar -xzvf podman-remote-static.tar.gz
+    # cp podman-remote-static /usr/bin/podman
+    # from https://koji.fedoraproject.org/koji
+    wget https://kojipkgs.fedoraproject.org//packages/podman/3.2.1/1.fc34/x86_64/podman-3.2.1-1.fc34.x86_64.rpm
+    dnf localinstall -y podman-3.2.1-1.fc34.x86_64.rpm
+    podman info
     # Configuration for rootless: https://kind.sigs.k8s.io/docs/user/rootless/
     mkdir -p "/etc/systemd/system/user@.service.d"
     cat <<EOF >"/etc/systemd/system/user@.service.d/delegate.conf"
