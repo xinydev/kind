@@ -63,6 +63,7 @@ jobs:
 
       - name: Show provider info
         run: |
+          "$HELPER" dnf --showduplicate list podman
           "$HELPER" "$KIND_EXPERIMENTAL_PROVIDER" info
           "$HELPER" "$KIND_EXPERIMENTAL_PROVIDER" version
 
