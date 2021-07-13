@@ -45,7 +45,7 @@ If you want to change this, you can set `TAG` environment variable.
 For "production" base images one of the maintainers will run `make -C images/base push` which cross-compiles for all architectures and pushes to the registry.
 
 You generally don't need to cross build during development, and currently the cross
-build *must* be pushed instead of loaded locally, due to limitations in `docker buildx` (TODO: link to upstream issue).
+build *must* be pushed instead of loaded locally, due to [limitations](https://github.com/docker/buildx/issues/59) in `docker buildx`.
 
 To test out your changes take the image you built with `make quick` and use it
 as the `--base-image` flag when running `kind build node-image` / building node images. You can then create a cluster with this node image (`kind create cluster --image=kindest/node:latest`)
