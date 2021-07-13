@@ -33,7 +33,7 @@ Vagrant.configure("2") do |config|
     # cp podman-remote-static /usr/bin/podman
     # from https://koji.fedoraproject.org/koji
     wget https://kojipkgs.fedoraproject.org//packages/podman/3.2.1/1.fc34/x86_64/podman-3.2.1-1.fc34.x86_64.rpm
-    dnf localinstall -y podman-3.2.1-1.fc34.x86_64.rpm
+    dnf localinstall -y podman-3.2.2-1.fc34.x86_64.rpm
     podman info
     # Configuration for rootless: https://kind.sigs.k8s.io/docs/user/rootless/
     mkdir -p "/etc/systemd/system/user@.service.d"
