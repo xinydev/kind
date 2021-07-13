@@ -28,6 +28,7 @@ Vagrant.configure("2") do |config|
     systemctl enable --now docker
 
     # install podman
+    dnf install -y wget tar
     wget https://github.com/containers/podman/releases/download/v3.2.1/podman-remote-static.tar.gz
     tar -xzvf podman-remote-static.tar.gz
     cp podman-remote-static /usr/bin/podman
